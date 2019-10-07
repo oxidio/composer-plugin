@@ -1,5 +1,8 @@
 {
-  "name": "oxid-esales/oxideshop-composer-plugin",
+  "name": "oxidio/composer-plugin",
+  "replace": {
+    "oxid-esales/oxideshop-composer-plugin": "self.version"
+  },
   "description": "This file is mean to be used to install OXID eShop compilation.",
   "type": "composer-plugin",
   "keywords": ["oxidEshop", "plugin"],
@@ -28,6 +31,10 @@
     "psr-4": { "OxidEsales\\ComposerPlugin\\Tests\\": "tests/" }
   },
   "extra": {
+    "branch-alias": {
+      "dev-oxidio-2.x": "2.x-dev",
+      "dev-master": "3.x-dev"
+    },
     "class": "OxidEsales\\ComposerPlugin\\Plugin"
   }
 }
