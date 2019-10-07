@@ -145,9 +145,15 @@ class ShopPackageInstaller extends AbstractPackageInstaller
         $shopConfigFileName = Path::join($installationDirectoryOfShopSource, self::SHOP_SOURCE_CONFIGURATION_FILE);
 
         if ($this->isConfigFileNotConfiguredOrMissing($shopConfigFileName)) {
+            $setup = self::SHOP_SOURCE_SETUP_DIRECTORY . '/';
+            $filter = array_map(function ($rule) use ($setup) {
+                return strpos($rule, $setup) === 0 ? substr($rule, strlen($setup)) : null;
+            }, $this->getBlacklistFilterValue());
+
             CopyGlobFilteredFileManager::copy(
                 Path::join($packageDirectoryOfShopSource, self::SHOP_SOURCE_SETUP_DIRECTORY),
-                Path::join($installationDirectoryOfShopSource, self::SHOP_SOURCE_SETUP_DIRECTORY)
+                Path::join($installationDirectoryOfShopSource, self::SHOP_SOURCE_SETUP_DIRECTORY),
+                array_filter($filter)
             );
         }
     }
