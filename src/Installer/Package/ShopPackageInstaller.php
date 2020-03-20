@@ -103,19 +103,20 @@ class ShopPackageInstaller extends AbstractPackageInstaller
      */
     private function copyShopSourceFromPackageToTarget($packagePath)
     {
-        $filtersToApply = [
-            $this->getBlacklistFilterValue(),
-            [self::HTACCESS_FILTER],
-            [self::ROBOTS_EXCLUSION_FILTER],
-            [self::SETUP_FILES_FILTER],
-            [self::OFFLINE_FILE],
-            $this->getVCSFilter(),
-        ];
+        if (!($isWhiteList = $filter = $this->getWhitelistFilterValue())) {
+            $filter = array_merge(
+                $this->getBlacklistFilterValue(),
+                [self::HTACCESS_FILTER, self::ROBOTS_EXCLUSION_FILTER, self::SETUP_FILES_FILTER],
+                [self::OFFLINE_FILE],
+            $this->getVCSFilter()
+            );
+        }
 
         CopyGlobFilteredFileManager::copy(
             $this->getPackageDirectoryOfShopSource($packagePath),
             $this->getTargetDirectoryOfShopSource(),
-            $this->getCombinedFilters($filtersToApply)
+            $filter,
+            (bool) $isWhiteList
         );
     }
 
@@ -182,9 +183,15 @@ class ShopPackageInstaller extends AbstractPackageInstaller
         $shopConfigFileName = Path::join($installationDirectoryOfShopSource, self::SHOP_SOURCE_CONFIGURATION_FILE);
 
         if ($this->isConfigFileNotConfiguredOrMissing($shopConfigFileName)) {
+            $setup = self::SHOP_SOURCE_SETUP_DIRECTORY . '/';
+            $filter = array_map(function ($rule) use ($setup) {
+                return strpos($rule, $setup) === 0 ? substr($rule, strlen($setup)) : null;
+            }, $this->getBlacklistFilterValue());
+
             CopyGlobFilteredFileManager::copy(
                 Path::join($packageDirectoryOfShopSource, self::SHOP_SOURCE_SETUP_DIRECTORY),
-                Path::join($installationDirectoryOfShopSource, self::SHOP_SOURCE_SETUP_DIRECTORY)
+                Path::join($installationDirectoryOfShopSource, self::SHOP_SOURCE_SETUP_DIRECTORY),
+                array_filter($filter)
             );
         }
     }

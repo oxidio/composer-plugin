@@ -11,6 +11,7 @@ namespace OxidEsales\ComposerPlugin\Installer;
 
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
+use Composer\Package\RootPackageInterface;
 use OxidEsales\ComposerPlugin\Installer\Package\AbstractPackageInstaller;
 use OxidEsales\ComposerPlugin\Installer\Package\ComponentInstaller;
 use OxidEsales\ComposerPlugin\Installer\Package\ShopPackageInstaller;
@@ -58,7 +59,24 @@ class PackageInstallerTrigger extends LibraryInstaller
      */
     public function setSettings($settings)
     {
+        $hasBlackList = !empty($settings[AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_BLACKLIST]);
+        $hasWhiteList = !empty($settings[AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_WHITELIST]);
+        if ($hasBlackList && $hasWhiteList) {
+            throw new \InvalidArgumentException(sprintf(
+                'settings %s and %s should not be used together',
+                AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_BLACKLIST,
+                AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_WHITELIST
+            ));
+        }
         $this->settings = $settings;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getInstallPath(PackageInterface $package)
+    {
+        return $package instanceof RootPackageInterface ? getcwd() : parent::getInstallPath($package);
     }
 
     /**

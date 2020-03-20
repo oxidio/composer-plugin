@@ -12,24 +12,74 @@ namespace OxidEsales\ComposerPlugin\Tests\Integration\Installer;
 use Composer\Composer;
 use Composer\Config;
 use Composer\IO\NullIO;
+use Composer\Package\AliasPackage;
+use Composer\Package\Package;
+use Composer\Package\RootAliasPackage;
+use Composer\Package\RootPackage;
+use Composer\Util\Filesystem;
 use OxidEsales\ComposerPlugin\Installer\PackageInstallerTrigger;
+use OxidEsales\ComposerPlugin\Installer\Package\AbstractPackageInstaller;
 
 class PackageInstallerTriggerTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @return PackageInstallerTrigger
+     */
+    private function createTrigger()
+    {
+        $composerConfigMock = $this->getMockBuilder(Config::class)->getMock();
+        $composerMock = $this->getMockBuilder(Composer::class)->getMock();
+        $composerMock->method('getConfig')->withAnyParameters()->willReturn($composerConfigMock);
+        return new PackageInstallerTrigger(new NullIO, $composerMock);
+    }
+
+    /**
+     * @covers PackageInstallerTrigger::setSettings
+     */
+    public function testSetSettings()
+    {
+        $trigger = $this->createTrigger();
+
+        // both empty => ok
+        $trigger->setSettings([
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_BLACKLIST => [],
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_WHITELIST => [],
+        ]);
+
+        // only blacklist => ok
+        $trigger->setSettings([
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_BLACKLIST => ['not-empty'],
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_WHITELIST => [],
+        ]);
+
+        // only whitelist => ok
+        $trigger->setSettings([
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_BLACKLIST => [],
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_WHITELIST => ['not-empty'],
+        ]);
+
+        $exception = new \InvalidArgumentException(sprintf(
+            'settings %s and %s should not be used together',
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_BLACKLIST,
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_WHITELIST
+        ));
+        $this->expectExceptionObject($exception);
+
+        // both not empty => not ok
+        $trigger->setSettings([
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_BLACKLIST => ['not-empty'],
+            AbstractPackageInstaller::EXTRA_PARAMETER_FILTER_WHITELIST => ['not-empty'],
+        ]);
+    }
+
     /**
      * The composer.json file already in source for 5.3.
      */
     public function testGetShopSourcePathByConfiguration()
     {
-        $composerConfigMock = $this->getMockBuilder(Config::class)->getMock();
-        $composerMock = $this->getMockBuilder(Composer::class)->getMock();
-        $composerMock->method('getConfig')->withAnyParameters()->willReturn($composerConfigMock);
-
-        $packageInstallerStub = new PackageInstallerTrigger(new NullIO(), $composerMock);
-        $packageInstallerStub->setSettings([
-            'source-path' => 'some/path/to/source'
-        ]);
-        $this->assertEquals($packageInstallerStub->getShopSourcePath(), 'some/path/to/source');
+        $packageInstallerStub = $this->createTrigger();
+        $packageInstallerStub->setSettings(['source-path' => 'some/path/to/source']);
+        $this->assertEquals('some/path/to/source', $packageInstallerStub->getShopSourcePath());
     }
 
     /**
@@ -41,9 +91,44 @@ class PackageInstallerTriggerTest extends \PHPUnit\Framework\TestCase
         $composerMock = $this->getMockBuilder(Composer::class)->getMock();
         $composerMock->method('getConfig')->withAnyParameters()->willReturn($composerConfigMock);
 
-        $packageInstallerStub = new PackageInstallerTrigger(new NullIO(), $composerMock);
-        $result = $packageInstallerStub->getShopSourcePath();
+    /**
+     * @covers PackageInstallerTrigger::getInstallPath
+     */
+    public function testGetInstallPath()
+    {
+        $trigger = function() {
+            $composer = new Composer;
+            $composer->setConfig(new Config);
+            return new PackageInstallerTrigger(
+                new NullIO,
+                $composer,
+                'library',
+                $this->getMockBuilder(Filesystem::class)->getMock()
+            );
+        };
 
-        $this->assertEquals($result, getcwd() . '/source');
+        $this->assertSame(
+            'foo/bar',
+            $trigger()->getInstallPath(new Package('foo/bar', null, null)),
+            'package => vendor/*'
+        );
+
+        $this->assertSame(
+            getcwd(),
+            $trigger()->getInstallPath($root = new RootPackage('foo/bar', null, null)),
+            'root package => current working directory'
+        );
+
+        $this->assertSame(
+            'foo/bar',
+            $trigger()->getInstallPath(new AliasPackage($root, null, null)),
+            'aliased package => vendor/*'
+        );
+
+        $this->assertSame(
+            getcwd(),
+            $trigger()->getInstallPath(new RootAliasPackage($root, null, null)),
+            'aliased root package => current working directory'
+        );
     }
 }
