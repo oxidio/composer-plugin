@@ -105,7 +105,9 @@ class CopyGlobFilteredFileManager
     private static function getFlatFileListIterator($sourcePath)
     {
         $recursiveFileIterator = new \RecursiveDirectoryIterator($sourcePath, \FilesystemIterator::SKIP_DOTS);
-        return new \RecursiveIteratorIterator($recursiveFileIterator);
+        $flatFileListIterator = new \RecursiveIteratorIterator($recursiveFileIterator);
+
+        return $flatFileListIterator;
     }
 
     /**
@@ -146,7 +148,7 @@ class CopyGlobFilteredFileManager
         $relativeSourcePath = self::getRelativePathForSingleFile($sourcePathOfFile);
 
         if (!($isWhiteList xor GlobMatcher::matchAny($relativeSourcePath, $globExpressionList))) {
-            $filesystem->copy($sourcePathOfFile, $destinationPath, ["override" => true]);
+            $filesystem->copy($sourcePathOfFile, $destinationPath, true);
         }
     }
 }

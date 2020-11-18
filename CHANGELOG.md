@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [master] - Unreleased
+
+### Changed
+- Update symfony components to version 5
+
+### Removed
+- Module blacklist-filter functionality
+
 ## [5.1.1] - Unreleased
 
 ### Deprecated
@@ -18,7 +26,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Bootstrap container is used for the module installation
-- Revert feature: plugin updates oxid eshop components only if they have any updates
 
 ## [5.0.0] - 2020-04-24
 
@@ -38,9 +45,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Component installer uses main container if shop is launched
 
 ## [4.1.0] - 2020-02-25
-
-### Changed
-- Update symfony components to version 5
 
 ### Removed
 - Support for PHP 7.0
