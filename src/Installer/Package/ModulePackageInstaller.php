@@ -43,8 +43,7 @@ class ModulePackageInstaller extends AbstractPackageInstaller
     public function install($packagePath)
     {
         $this->getIO()->write("Installing module {$this->getPackageName()} package.");
-        $moduleInstaller = $this->getModuleInstaller();
-        $moduleInstaller->install($this->getOxidShopPackage($packagePath));
+        $this->getBootstrapModuleInstaller()->install($this->getOxidShopPackage($packagePath));
     }
 
     /**
@@ -63,7 +62,6 @@ class ModulePackageInstaller extends AbstractPackageInstaller
      */
     public function update($packagePath)
     {
-        $moduleInstaller = $this->getModuleInstaller();
         $package = $this->getOxidShopPackage($packagePath);
 
         /**
@@ -75,7 +73,7 @@ class ModulePackageInstaller extends AbstractPackageInstaller
             $question .= "source/modules. Do you want to overwrite them? (y/N) ";
             if ($this->askQuestion($question)) {
                 $this->getIO()->write("Updating module {$this->getPackageName()} files...");
-                $moduleInstaller->install($package);
+                $this->getBootstrapModuleInstaller()->install($package);
             }
         } else {
             $this->install($packagePath);
@@ -91,8 +89,7 @@ class ModulePackageInstaller extends AbstractPackageInstaller
             return ContainerFactory::getInstance()->getContainer()
                 ->get(ModuleInstallerInterface::class);
         } else {
-            return BootstrapContainerFactory::getBootstrapContainer()
-                ->get('oxid_esales.module.install.service.bootstrap_module_installer');
+            return $this->getBootstrapModuleInstaller();
         }
     }
 
@@ -112,8 +109,7 @@ class ModulePackageInstaller extends AbstractPackageInstaller
      */
     private function getModuleFilesInstaller(): ModuleFilesInstallerInterface
     {
-        $container = BootstrapContainerFactory::getBootstrapContainer();
-        return $container->get(ModuleFilesInstallerInterface::class);
+        return BootstrapContainerFactory::getBootstrapContainer()->get(ModuleFilesInstallerInterface::class);
     }
 
     /**
@@ -152,5 +148,11 @@ class ModulePackageInstaller extends AbstractPackageInstaller
         );
 
         return Path::join($this->getRootDirectory(), static::MODULES_DIRECTORY, $targetDirectory);
+    }
+
+    private function getBootstrapModuleInstaller(): ModuleInstallerInterface
+    {
+        return BootstrapContainerFactory::getBootstrapContainer()
+            ->get('oxid_esales.module.install.service.bootstrap_module_installer');
     }
 }

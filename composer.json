@@ -14,8 +14,8 @@
   "prefer-stable": true,
   "require": {
     "php": "^7.0",
-    "composer-plugin-api": "^1.0",
-    "symfony/filesystem": "^5.0.4",
+    "composer-plugin-api": "^1.0||^2.0",
+    "symfony/filesystem": "^3.0",
     "webmozart/glob": "^4.1",
     "webmozart/path-util": "^2.3"
   },
@@ -23,7 +23,7 @@
     "phpunit/phpunit": "~6",
     "mikey179/vfsstream": "^1.6",
     "squizlabs/php_codesniffer": "3.*",
-    "composer/composer": "^1.0"
+    "composer/composer": "^1.0||^2.0"
   },
   "autoload": {
     "psr-4": {"OxidEsales\\ComposerPlugin\\": "src"}
@@ -35,7 +35,8 @@
     "branch-alias": {
       "dev-oxidio-2.x": "2.x-dev",
       "dev-oxidio-4.x": "4.x-dev",
-      "dev-oxidio-master": "5.x-dev"
+      "dev-oxidio-6.x": "6.x-dev",
+      "dev-oxidio-master": "7.x-dev"
     },
     "class": "OxidEsales\\ComposerPlugin\\Plugin"
   }

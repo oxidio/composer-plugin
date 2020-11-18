@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.1.1] - Unreleased
+
+### Deprecated
+- Module blacklist-filter functionality
+
+## [5.1.0] - 2020-11-04
+
+### Added
+- Support for composer v2
+
+## [5.0.1] - 2020-07-03
+
+### Fixed
+- Bootstrap container is used for the module installation
+- Revert feature: plugin updates oxid eshop components only if they have any updates
+
+## [5.0.0] - 2020-04-24
+
+### Removed
+- `OxidEsales\ComposerPlugin\Plugin::updatePackages()`
+- `OxidEsales\ComposerPlugin\Plugin::executeAction()`
+- `OxidEsales\ComposerPlugin\Plugin::ACTION_INSTALL`
+- `OxidEsales\ComposerPlugin\Plugin::ACTION_UPDATE`
+
+### Changed
+- Plugin updates oxid eshop components only if they have any updates
+- Skip overwriting favicon.ico file on update [PR-23](https://github.com/OXID-eSales/oxideshop_composer_plugin/pull/23)
+
+## [4.1.1] - 2020-04-14
+
+### Changed
+- Component installer uses main container if shop is launched
+
 ## [4.1.0] - 2020-02-25
 
 ### Changed
@@ -20,6 +53,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fix code style to fit PSR-2 standard [PR-20](https://github.com/OXID-eSales/oxideshop_composer_plugin/pull/20)
 - Fix code style to fit PSR-12 [PR-21](https://github.com/OXID-eSales/oxideshop_composer_plugin/pull/21)
+- Made composer.json compatible with composer v2
 
 ## [4.0.0] - 2019-10-15
 
@@ -53,8 +87,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - [Add robot exclusion files filter](https://bugs.oxid-esales.com/view.php?id=6703)
 
-[4.1.0]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v4.0.0...4.1.0
-[4.0.0]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v3.0.0...4.0.0
+[5.1.1]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v5.1.0...v5.1.1
+[5.1.0]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v5.0.1...v5.1.0
+[5.0.1]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v5.0.0...v5.0.1
+[5.0.0]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v4.1.1...v5.0.0
+[4.1.1]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v4.1.0...v4.1.1
+[4.1.0]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v4.0.0...v4.1.0
+[4.0.0]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v3.0.0...v4.0.0
 [3.0.0]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v2.0.4...v3.0.0
 [2.0.4]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/OXID-eSales/oxideshop_composer_plugin/compare/v2.0.2...v2.0.3
